@@ -83,7 +83,7 @@ if [ -z "${OLLAMA_SKIP_CPU_GENERATE}" ]; then
     if [ -n "${OLLAMA_CUSTOM_CPU_DEFS}" ]; then
         init_vars
         echo "OLLAMA_CUSTOM_CPU_DEFS=\"${OLLAMA_CUSTOM_CPU_DEFS}\""
-        CMAKE_DEFS="${OLLAMA_CUSTOM_CPU_DEFS} -DCMAKE_POSITION_INDEPENDENT_CODE=on  -DCMAKE_C_COMPILER=gcc-10 -DCMAKE_CXX_COMPILER=g++-10 ${CMAKE_DEFS}"
+        CMAKE_DEFS="${OLLAMA_CUSTOM_CPU_DEFS} -DCMAKE_POSITION_INDEPENDENT_CODE=on ${CMAKE_DEFS}"
         BUILD_DIR="../build/linux/${ARCH}/cpu"
         echo "Building custom CPU"
         build
@@ -122,8 +122,7 @@ if [ -z "${OLLAMA_SKIP_CPU_GENERATE}" ]; then
                 # Approximately 400% faster than LCD on same CPU
                 #
                 init_vars
-                CMAKE_DEFS="${COMMON_CPU_DEFS} -DLLAMA_AVX=on -DLLAMA_AVX2=off -DLLAMA_AVX512=off -DLLAMA_FMA=off -DLLAMA_F16C=off ${CMAKE_DEFS}"
-                CMAKE_DEFS="${CMAKE_DEFS} -DCMAKE_C_COMPILER=gcc-10 -DCMAKE_CXX_COMPILER=g++-10"
+                CMAKE_DEFS="${COMMON_CPU_DEFS} -DLLAMA_AVX=on -DLLAMA_AVX2=off -DLLAMA_AVX512=off -DLLAMA_FMA=off -DLLAMA_F16C=off"
                 BUILD_DIR="../build/linux/${ARCH}/cpu_avx"
                 echo "Building AVX CPU"
                 build
@@ -137,7 +136,7 @@ if [ -z "${OLLAMA_SKIP_CPU_GENERATE}" ]; then
                 #
                 init_vars
                 CMAKE_DEFS="${COMMON_CPU_DEFS} -DLLAMA_AVX=on -DLLAMA_AVX2=on -DLLAMA_AVX512=off -DLLAMA_FMA=on -DLLAMA_F16C=on ${CMAKE_DEFS}"
-                CMAKE_DEFS="${CMAKE_DEFS} -DCMAKE_C_COMPILER=gcc-10 -DCMAKE_CXX_COMPILER=g++-10"
+                CMAKE_DEFS="${COMMON_CPU_DEFS} -DLLAMA_AVX=on -DLLAMA_AVX2=on -DLLAMA_AVX512=off -DLLAMA_FMA=off -DLLAMA_F16C=on"
                 BUILD_DIR="../build/linux/${ARCH}/cpu_avx2"
                 echo "Building AVX2 CPU"
                 build
@@ -191,7 +190,6 @@ fi
         CMAKE_CUDA_DEFS="-DLLAMA_CUDA=on -DLLAMA_CUDA_FORCE_MMQ=on -DCMAKE_CUDA_ARCHITECTURES=${CMAKE_CUDA_ARCHITECTURES}"
     fi
     CMAKE_DEFS="${COMMON_CMAKE_DEFS} ${CMAKE_DEFS} ${ARM64_DEFS} ${CMAKE_CUDA_DEFS}"
-    CMAKE_DEFS="${CMAKE_DEFS} -DCMAKE_C_COMPILER=gcc-10 -DCMAKE_CXX_COMPILER=g++-10"
     BUILD_DIR="../build/linux/${ARCH}/cuda${CUDA_VARIANT}"
     EXTRA_LIBS="-L${CUDA_LIB_DIR} -lcudart -lcublas -lcublasLt -lcuda"
     build
