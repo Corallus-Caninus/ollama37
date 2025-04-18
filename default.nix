@@ -34,6 +34,9 @@ pkgs.mkShell {
     # Ensure gcc-10 binaries are findable in the PATH for scripts
     export PATH=${pkgs.gcc10}/bin:$PATH
     export CUDA_LIB_DIR=$CUDA_PATH/lib:$CUDA_PATH/lib64
+    # Export specific paths for compilers to be used directly in build scripts
+    export OLLAMA_GCC10_PATH=${pkgs.gcc10}/bin/gcc
+    export OLLAMA_GPP10_PATH=${pkgs.gcc10}/bin/g++
 export PKG_CONFIG_PATH="${pkgs.python39}/lib/pkgconfig:$PKG_CONFIG_PATH"
     alias gcc="${pkgs.gcc10}/bin/gcc"
   '';
