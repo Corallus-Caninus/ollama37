@@ -44,6 +44,9 @@ amdGPUs() {
 
 echo "Starting linux generate script"
 if [ -z "${CUDACXX}" ]; then
+#    export CXXFLAGS="$CXXFLAGS --allow-unsupported-compiler"
+    export CUDAFLAGS="--allow-unsupported-compiler"
+
     if [ -x /usr/local/cuda/bin/nvcc ]; then
         export CUDACXX=/usr/local/cuda/bin/nvcc
     else
@@ -156,8 +159,10 @@ if [ -z "${CUDART_LIB_DIR}" ]; then
     CUDART_LIB_DIR="${CUDA_LIB_DIR}"
 fi
 
-if [ -d "${CUDA_LIB_DIR}" ]; then
+#if [ -d "${CUDA_LIB_DIR}" ]; then
+#if 1; then
     echo "CUDA libraries detected - building dynamic CUDA library"
+    export CUDAFLAGS="--allow-unsupported-compiler"
     init_vars
     CUDA_MAJOR=$(ls "${CUDA_LIB_DIR}"/libcudart.so.* | head -1 | cut -f3 -d. || true)
     if [ -n "${CUDA_MAJOR}" ]; then
@@ -204,7 +209,7 @@ if [ -d "${CUDA_LIB_DIR}" ]; then
     done
     compress
 
-fi
+#fi
 
 if [ -z "${ROCM_PATH}" ]; then
     # Try the default location in case it exists
