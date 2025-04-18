@@ -25,9 +25,7 @@ pkgs.mkShell {
   shellHook = ''
     echo "You are now using a NIX environment"
     export CUDA_PATH=${pkgs.cudaPackages_11.cudatoolkit}
-#    export LD_LIBRARY_PATH=${pkgs.stdenv.cc.cc.lib}/lib
     export LD_LIBRARY_PATH=${pkgs.stdenv.cc.cc.lib}/lib:${pkgs.gcc10}/lib
-#    export LD_LIBRARY_PATH=${pkgs.gcc11}/lib
     export EXTRA_LD_FLAGS="-L\/lib -L${pkgs.linuxPackages.nvidia_x11_legacy470}\/lib"
 #    export LD_LIBRARY_PATH=${pkgs.linuxPackages.nvidia_x11_legacy470}/lib:${pkgs.cudaPackages.cudatoolkit}/lib64:$LD_LIBRARY_PATH  
     export LD_LIBRARY_PATH=${pkgs.linuxPackages.nvidia_x11_legacy470}/lib:$LD_LIBRARY_PATH
