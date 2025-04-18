@@ -79,7 +79,15 @@ apply_patches() {
 }
 
 build() {
-    cmake -S ${LLAMACPP_DIR} -B ${BUILD_DIR} ${CMAKE_DEFS}
+    # Ensure CMake uses the correct compilers from the Nix environment
+    # by finding their full paths and setting CC/CXX environment variables.
+    local C_COMPILER=$(command -v gcc-10)
+    local CXX_COMPILER=$(command -v g++-10)
+    if [ -z "$C_COMPILER" ] || [ -z "$CXX_COMPILER" ]; then
+        echo "Error: gcc-10 or g++-10 not found in PATH. Make sure they are available in your Nix environment."
+        exit 1
+    fi
+    CC="$C_COMPILER" CXX="$CXX_COMPILER" cmake -S ${LLAMACPP_DIR} -B ${BUILD_DIR} ${CMAKE_DEFS}
     cmake --build ${BUILD_DIR} ${CMAKE_TARGETS} -j8
 }
 
