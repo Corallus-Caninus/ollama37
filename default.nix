@@ -31,9 +31,10 @@ pkgs.mkShell {
     export LD_LIBRARY_PATH=${pkgs.linuxPackages.nvidia_x11_legacy470}/lib:$LD_LIBRARY_PATH
     export LD_LIBRARY_PATH=${pkgs.python39}/lib:$LD_LIBRARY_PATH
     export LD_LIBRARY_PATH=$CUDA_PATH/lib:$LD_LIBRARY_PATH
+    # Ensure gcc-10 binaries are findable in the PATH for scripts
+    export PATH=${pkgs.gcc10}/bin:$PATH
     export CUDA_LIB_DIR=$CUDA_PATH/lib:$CUDA_PATH/lib64
 export PKG_CONFIG_PATH="${pkgs.python39}/lib/pkgconfig:$PKG_CONFIG_PATH"
     alias gcc="${pkgs.gcc10}/bin/gcc"
   '';
 }
-
