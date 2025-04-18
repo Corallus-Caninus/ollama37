@@ -39,5 +39,6 @@ pkgs.mkShell {
     export OLLAMA_GPP10_PATH=${pkgs.gcc10}/bin/g++
 export PKG_CONFIG_PATH="${pkgs.python39}/lib/pkgconfig:$PKG_CONFIG_PATH"
     alias gcc="${pkgs.gcc10}/bin/gcc"
+export CUDA_VISIBLE_DEVICES=0,1
   '';
 }
