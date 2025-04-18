@@ -14,9 +14,6 @@
 set -ex
 set -o pipefail
 
-export CMAKE_C_COMPILER=gcc-10
-export CMAKE_CXX_COMPILER=g++-10
-
 # See https://llvm.org/docs/AMDGPUUsage.html#processors for reference
 amdGPUs() {
     if [ -n "${AMDGPU_TARGETS}" ]; then
@@ -136,7 +133,6 @@ if [ -z "${OLLAMA_SKIP_CPU_GENERATE}" ]; then
                 #
                 init_vars
                 CMAKE_DEFS="${COMMON_CPU_DEFS} -DLLAMA_AVX=on -DLLAMA_AVX2=on -DLLAMA_AVX512=off -DLLAMA_FMA=on -DLLAMA_F16C=on ${CMAKE_DEFS}"
-                CMAKE_DEFS="${COMMON_CPU_DEFS} -DLLAMA_AVX=on -DLLAMA_AVX2=on -DLLAMA_AVX512=off -DLLAMA_FMA=off -DLLAMA_F16C=on"
                 BUILD_DIR="../build/linux/${ARCH}/cpu_avx2"
                 echo "Building AVX2 CPU"
                 build
