@@ -81,6 +81,7 @@ apply_patches() {
 build() {
     # Ensure CMake uses the correct compilers from the Nix environment
     # by using the specific paths exported from default.nix and exporting CC/CXX.
+    # Also pass them directly via CMAKE definitions for robustness.
     if [ -z "$OLLAMA_GCC10_PATH" ] || [ -z "$OLLAMA_GPP10_PATH" ]; then
         echo "Error: OLLAMA_GCC10_PATH or OLLAMA_GPP10_PATH not set. Check default.nix shellHook."
         exit 1
@@ -91,7 +92,8 @@ build() {
     fi
     export CC="$OLLAMA_GCC10_PATH"
     export CXX="$OLLAMA_GPP10_PATH"
-    cmake -S ${LLAMACPP_DIR} -B ${BUILD_DIR} ${CMAKE_DEFS}
+    local cmake_defs_with_compilers="${CMAKE_DEFS} -DCMAKE_C_COMPILER=${OLLAMA_GCC10_PATH} -DCMAKE_CXX_COMPILER=${OLLAMA_GPP10_PATH}"
+    cmake -S ${LLAMACPP_DIR} -B ${BUILD_DIR} ${cmake_defs_with_compilers}
     cmake --build ${BUILD_DIR} ${CMAKE_TARGETS} -j8
 }
 
