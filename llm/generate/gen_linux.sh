@@ -195,16 +195,37 @@ fi
     # TODO - in the future we may shift to packaging these separately and conditionally
     #        downloading them in the install script.
     DEPS="$(ldd ${BUILD_DIR}/bin/ollama_llama_server )"
-    for lib in libcudart.so libcublas.so libcublasLt.so ; do
-        DEP=$(echo "${DEPS}" | grep ${lib} | cut -f1 -d' ' | xargs || true)
-        if [ -n "${DEP}" -a -e "${CUDA_LIB_DIR}/${DEP}" ]; then
-            cp "${CUDA_LIB_DIR}/${DEP}" "${BUILD_DIR}/bin/"
-        elif [ -e "${CUDA_LIB_DIR}/${lib}.${CUDA_MAJOR}" ]; then
-            cp "${CUDA_LIB_DIR}/${lib}.${CUDA_MAJOR}" "${BUILD_DIR}/bin/"
-        elif [ -e "${CUDART_LIB_DIR}/${lib}" ]; then
-            cp -d ${CUDART_LIB_DIR}/${lib}* "${BUILD_DIR}/bin/"
+    # Extract the directory path from the ldd output for a known CUDA library
+    # This avoids issues with CUDA_LIB_DIR potentially having multiple paths
+    cuda_lib_path_detected=$(echo "${DEPS}" | grep libcudart.so | grep "=>" | cut -d '>' -f 2 | cut -d '(' -f 1 | xargs)
+    cuda_dir_detected=$(dirname "${cuda_lib_path_detected}")
+
+    if [ -z "${cuda_dir_detected}" ] || [ ! -d "${cuda_dir_detected}" ]; then
+        echo "Error: Failed to detect CUDA library directory from ldd output."
+        # Fallback or error handling could be added here if needed
+        exit 1
+    fi
+    echo "Detected CUDA library directory: ${cuda_dir_detected}"
+
+    for lib_base_name in libcudart.so libcublas.so libcublasLt.so ; do
+        # Find the specific library file linked by the executable
+        line=$(echo "${DEPS}" | grep "${lib_base_name}")
+        if [ -n "$line" ]; then
+            # Extract the full path (e.g., /nix/store/.../lib/libcudart.so.11.0)
+            full_path=$(echo "$line" | grep "=>" | cut -d '>' -f 2 | cut -d '(' -f 1 | xargs)
+            if [ -n "$full_path" -a -e "$full_path" ]; then
+                # Copy the specific file found by ldd
+                echo "Copying dependency: ${full_path}"
+                cp "${full_path}" "${BUILD_DIR}/bin/"
+            else
+                 echo "Warning: Could not find or copy dependency ${lib_base_name} at expected path ${full_path}. Trying directory ${cuda_dir_detected}"
+                 # Fallback: Try copying using the detected directory and base name pattern
+                 cp -d "${cuda_dir_detected}/${lib_base_name}"* "${BUILD_DIR}/bin/" || echo "Warning: Fallback copy failed for ${lib_base_name}"
+            fi
         else
-            cp -d "${CUDA_LIB_DIR}/${lib}*" "${BUILD_DIR}/bin/"
+            echo "Warning: Could not find dependency line for ${lib_base_name} in ldd output. Trying directory ${cuda_dir_detected}"
+            # Fallback: Try copying using the detected directory and base name pattern
+            cp -d "${cuda_dir_detected}/${lib_base_name}"* "${BUILD_DIR}/bin/" || echo "Warning: Fallback copy failed for ${lib_base_name}"
         fi
     done
     compress
