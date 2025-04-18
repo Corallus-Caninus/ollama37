@@ -119,7 +119,7 @@ if [ -z "${OLLAMA_SKIP_CPU_GENERATE}" ]; then
                 # Approximately 400% faster than LCD on same CPU
                 #
                 init_vars
-                CMAKE_DEFS="${COMMON_CPU_DEFS} -DLLAMA_AVX=on -DLLAMA_AVX2=off -DLLAMA_AVX512=off -DLLAMA_FMA=off -DLLAMA_F16C=off"
+                CMAKE_DEFS="${COMMON_CPU_DEFS} -DLLAMA_AVX=on -DLLAMA_AVX2=off -DLLAMA_AVX512=off -DLLAMA_FMA=off -DLLAMA_F16C=off ${CMAKE_DEFS}"
                 BUILD_DIR="../build/linux/${ARCH}/cpu_avx"
                 echo "Building AVX CPU"
                 build
